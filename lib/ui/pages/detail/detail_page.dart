@@ -126,7 +126,7 @@ class _TodoDetailContentState extends State<_TodoDetailContent> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/'),
+          onPressed: () => context.pop(),
         ),
         title: Hero(
           tag: widget.todo.id,

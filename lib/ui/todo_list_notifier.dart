@@ -5,18 +5,41 @@ import 'package:tasks/domain/repository/todo_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tasks/ui/providers.dart';
 
-class TodoListNotifier extends Notifier<List<ToDoEntity>> {
+class TodoListState {
+  final List<ToDoEntity> todos;
+  final int page;
+  final bool isLastPage;
+
+  TodoListState({
+    this.todos = const [],
+    this.page = 0,
+    this.isLastPage = false,
+  });
+}
+
+class TodoListNotifier extends Notifier<TodoListState> {
   late final TodoRepository _repo;
+  final int _limit = 15; // 한 번에 가져올 개수
 
   @override
-  List<ToDoEntity> build() {
+  TodoListState build() {
     _repo = ref.read(todoRepositoryProvider);
-    fetch();
-    return [];
+    return TodoListState();
   }
 
-  Future<void> fetch() async {
-    state = await _repo.getToDos();
+  Future<void> fetch({bool isRefresh = false}) async {
+    if (!isRefresh && state.isLastPage) return;
+
+    final int targetPage = isRefresh ? 0 : state.page;
+
+    // Repository의 getToDos가 page와 limit을 받는다고 가정 (필요시 레포 수정)
+    final newTodos = await _repo.getToDos(page: targetPage, limit: _limit);
+
+    state = TodoListState(
+      todos: isRefresh ? newTodos : [...state.todos, ...newTodos],
+      page: targetPage + 1,
+      isLastPage: newTodos.length < _limit, // 가져온 데이터가 15개 미만이면 마지막 페이지
+    );
   }
 
   /// 할 일 저장

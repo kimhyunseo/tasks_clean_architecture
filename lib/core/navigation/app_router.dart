@@ -5,14 +5,18 @@ import 'package:tasks/ui/pages/home/home_page.dart';
 final router = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const HomePage()),
-
     GoRoute(
-      path: '/detail/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return TodoDetailPage(id: id);
-      },
+      path: '/',
+      builder: (context, state) => const HomePage(),
+      routes: [
+        GoRoute(
+          path: 'detail/:id',
+          builder: (context, state) {
+            final id = state.pathParameters['id']!;
+            return TodoDetailPage(id: id);
+          },
+        ),
+      ],
     ),
   ],
 );

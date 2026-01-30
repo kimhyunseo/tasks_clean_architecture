@@ -11,11 +11,12 @@ class TodoRepositoryImpl implements TodoRepository {
 
   /// 할 일 목록 보기
   @override
-  Future<List<ToDoEntity>> getToDos() async {
+  Future<List<ToDoEntity>> getToDos({int limit = 15}) async {
     try {
       final result = await firestore
           .collection('todos')
           .orderBy('createdAt', descending: true)
+          .limit(limit)
           .get();
 
       return result.docs.map((doc) {
