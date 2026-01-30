@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "683790091972",
+    "project_id": "tasks-riverpod",
+    "storage_bucket": "tasks-riverpod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:683790091972:android:55489feccb2de56b822b91",
+        "android_client_info": {
+          "package_name": "com.example.tasks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAcUsykmKohwUejFuPSUJcUiQwOropcNc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
