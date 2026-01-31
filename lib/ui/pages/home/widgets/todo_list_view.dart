@@ -19,11 +19,12 @@ class TodoView extends ConsumerWidget {
             print('마지막입니다.');
           }
         }
-        return true;
+        return false;
       },
       child: ListView.builder(
         padding: EdgeInsets.fromLTRB(12, 12, 12, 150),
         itemCount: homeState.todos.length,
+        physics: const AlwaysScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {

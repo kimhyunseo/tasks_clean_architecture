@@ -44,10 +44,10 @@ class DetailViewModel extends Notifier<DetailState> {
 
   @override
   DetailState build() {
-    final todo = ref.watch(todoListProvider);
+    final todoListState = ref.watch(todoListProvider);
     return DetailState(
-      todo: todo.where((todo) => todo.id == id).firstOrNull,
-      isLoading: false,
+      todo: todoListState.todos.firstWhere((todo) => todo.id == id),
+      isLoading: todoListState.isLoading,
     );
   }
 

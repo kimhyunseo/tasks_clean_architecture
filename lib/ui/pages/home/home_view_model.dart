@@ -56,8 +56,11 @@ class HomeToggleDoneRequested extends HomeEvent {
 class HomeViewModel extends Notifier<HomeState> {
   @override
   HomeState build() {
-    final allTodos = ref.watch(todoListProvider);
-    return HomeState(todos: allTodos, isLoading: false);
+    final todoListState = ref.watch(todoListProvider);
+    return HomeState(
+      todos: todoListState.todos,
+      isLoading: todoListState.isLoading,
+    );
   }
 
   Future<void> onEvent(HomeEvent event) async {

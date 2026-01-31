@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tasks/data/todo_firestore_dto.dart';
+import 'package:tasks/domain/entity/todo_page_result.dart';
 import 'package:tasks/domain/repository/todo_repository.dart';
 import '../entity/todo_entity.dart';
 
@@ -11,17 +12,23 @@ class TodoRepositoryImpl implements TodoRepository {
 
   /// 할 일 목록 보기
   @override
-  Future<List<ToDoEntity>> getToDos({int limit = 15}) async {
+  Future<TodoPageResult> getToDos({int limit = 15, Object? lastCursor}) async {
     try {
-      final result = await firestore
+      Query<Map<String, dynamic>> query = firestore
           .collection('todos')
           .orderBy('createdAt', descending: true)
-          .limit(limit)
-          .get();
+          .limit(limit);
 
-      return result.docs.map((doc) {
+      if (lastCursor != null) {
+        query = query.startAfterDocument(
+          lastCursor as DocumentSnapshot<Map<String, dynamic>>,
+        );
+      }
+
+      final result = await query.get();
+
+      final todos = result.docs.map((doc) {
         final dto = ToDoDto.fromFirestore(doc);
-
         return ToDoEntity(
           id: dto.id,
           title: dto.title,
@@ -32,6 +39,13 @@ class TodoRepositoryImpl implements TodoRepository {
           updatedAt: dto.updatedAt?.toDate(),
         );
       }).toList();
+
+      return TodoPageResult(
+        todos: todos,
+        lastCursor: result.docs.isNotEmpty
+            ? result.docs.last as DocumentSnapshot<Map<String, dynamic>>
+            : null,
+      );
     } catch (e) {
       print('할 일 목록을 불러오는 중 오류 발생: $e');
       rethrow;
