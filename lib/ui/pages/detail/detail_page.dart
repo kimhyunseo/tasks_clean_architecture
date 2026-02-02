@@ -3,10 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tasks/core/utils/throttler.dart';
 import 'package:tasks/domain/entity/todo_entity.dart';
 import 'package:tasks/ui/pages/detail/detail_view_model.dart';
-import 'package:tasks/utils/dialog_utils.dart';
-import 'package:tasks/utils/snackbar_utils.dart';
+import 'package:tasks/core/utils/dialog_utils.dart';
+import 'package:tasks/core/utils/snackbar_utils.dart';
 
 class TodoDetailPage extends ConsumerWidget {
   const TodoDetailPage({super.key, required this.id});
@@ -74,48 +75,60 @@ class _TodoDetailContentState extends State<_TodoDetailContent> {
   }
 
   void _editTodo() {
-    showConfirmationDialog(
-      context: context,
-      title: "저장 확인",
-      content: "변경된 내용을 저장하시겠습니까?",
-      confirmText: "저장",
-      isDestructive: false,
-      onConfirm: () async {
-        widget.viewModel.onEvent(
-          DetailEditTodo(
-            widget.todo.copyWith(
-              title: titleController.text,
-              description: descriptionController.text,
-            ),
-          ),
-        );
+    Throttler.run(
+      'edit_todo_${widget.todo.id}',
+      duration: Duration(milliseconds: 300),
+      action: () {
+        showConfirmationDialog(
+          context: context,
+          title: "저장 확인",
+          content: "변경된 내용을 저장하시겠습니까?",
+          confirmText: "저장",
+          isDestructive: false,
+          onConfirm: () async {
+            widget.viewModel.onEvent(
+              DetailEditTodo(
+                widget.todo.copyWith(
+                  title: titleController.text,
+                  description: descriptionController.text,
+                ),
+              ),
+            );
 
-        if (!mounted) return;
-        SnackbarUtils.showSnackBr(context, "할 일이 수정되었습니다");
+            if (!mounted) return;
+            SnackbarUtils.showSnackBr(context, "할 일이 수정되었습니다");
+          },
+        );
       },
     );
   }
 
   void _deleteTodo() {
-    showConfirmationDialog(
-      context: context,
-      title: "삭제 확인",
-      content: "정말 삭제하시겠습니까?",
-      confirmText: "삭제",
-      isDestructive: true,
-      onConfirm: () async {
-        if (mounted) {
-          Navigator.pop(context); // 다이얼로그 닫기
-        }
+    Throttler.run(
+      'delete_todo_${widget.todo.id}',
+      duration: Duration(milliseconds: 300),
+      action: () {
+        showConfirmationDialog(
+          context: context,
+          title: "삭제 확인",
+          content: "정말 삭제하시겠습니까?",
+          confirmText: "삭제",
+          isDestructive: true,
+          onConfirm: () async {
+            if (mounted) {
+              Navigator.pop(context); // 다이얼로그 닫기
+            }
 
-        // 삭제 요청
-        await widget.viewModel.onEvent(DetailDeleteTodo());
+            // 삭제 요청
+            await widget.viewModel.onEvent(DetailDeleteTodo());
 
-        if (!mounted) return;
+            if (!mounted) return;
 
-        // 삭제 후 뒤로 가기 및 스낵바
-        Navigator.pop(context); // 상세 페이지 닫기
-        SnackbarUtils.showSnackBr(context, "할 일이 삭제되었습니다");
+            // 삭제 후 뒤로 가기 및 스낵바
+            Navigator.pop(context); // 상세 페이지 닫기
+            SnackbarUtils.showSnackBr(context, "할 일이 삭제되었습니다");
+          },
+        );
       },
     );
   }
@@ -124,10 +137,10 @@ class _TodoDetailContentState extends State<_TodoDetailContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => context.pop(),
+        // ),
         title: Hero(
           tag: widget.todo.id,
           child: Material(
@@ -142,7 +155,13 @@ class _TodoDetailContentState extends State<_TodoDetailContent> {
         actions: [
           IconButton(
             onPressed: () {
-              widget.viewModel.onEvent(DetailToggleFavorite());
+              Throttler.run(
+                'toggle_favorite_${widget.todo.id}',
+                duration: Duration(milliseconds: 300),
+                action: () {
+                  widget.viewModel.onEvent(DetailToggleFavorite());
+                },
+              );
             },
             icon: widget.todo.isFavorite
                 ? const Icon(Icons.star_rounded, size: 28)

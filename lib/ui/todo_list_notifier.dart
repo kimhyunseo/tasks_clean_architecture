@@ -54,11 +54,13 @@ class TodoListNotifier extends Notifier<TodoListState> {
     );
 
     try {
-      // 새로고침이면 커서를 null로, 아니면 현재 state의 마지막 커서 전달
+      // 새로고침이면 커서를 null로 아니면 현재 state의 마지막 커서 전달
       final result = await _repo.getToDos(
         limit: _limit,
         lastCursor: isRefresh ? null : state.lastCursor,
       );
+
+      // print('이번 요청으로 가져온 아이템 개수: ${result.todos.length}');
 
       state = state.copyWith(
         todos: isRefresh ? result.todos : [...state.todos, ...result.todos],

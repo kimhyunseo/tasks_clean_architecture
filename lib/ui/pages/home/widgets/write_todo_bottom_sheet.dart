@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tasks/core/utils/throttler.dart';
 import 'package:tasks/domain/entity/todo_entity.dart';
 import 'package:tasks/ui/pages/home/home_view_model.dart';
 
@@ -39,7 +40,7 @@ class _PlusTodoState extends ConsumerState<WriteTodo> {
     super.dispose();
   }
 
-  void saveToDo() async {
+  void saveToDo() {
     final value = titleController.text;
     final descriptionValue = descriptionController.text;
 
@@ -48,22 +49,29 @@ class _PlusTodoState extends ConsumerState<WriteTodo> {
       return;
     }
 
-    final viewModel = ref.read(homeViewModel.notifier);
-    await viewModel.onEvent(
-      HomeAddTodo(
-        ToDoEntity(
-          id: '',
-          title: value,
-          description: descriptionValue,
-          isFavorite: isFavorite,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      ),
+    Throttler.run(
+      'save_todo',
+      duration: Duration(milliseconds: 1000),
+      action: () async {
+        final viewModel = ref.read(homeViewModel.notifier);
+        await viewModel.onEvent(
+          HomeAddTodo(
+            ToDoEntity(
+              id: '',
+              title: value,
+              description: descriptionValue,
+              isFavorite: isFavorite,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          ),
+        );
+
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      },
     );
-    if (mounted) {
-      Navigator.pop(context);
-    }
   }
 
   @override

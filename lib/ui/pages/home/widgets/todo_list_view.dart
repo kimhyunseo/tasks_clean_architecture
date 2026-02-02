@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tasks/core/routes/app_routes.dart';
+import 'package:tasks/core/utils/throttler.dart';
 import 'package:tasks/ui/pages/home/home_view_model.dart';
 import 'package:tasks/ui/pages/home/widgets/todo_list_item.dart';
 
@@ -28,11 +29,24 @@ class TodoView extends ConsumerWidget {
         itemCount: homeState.todos.length,
         physics: const AlwaysScrollableScrollPhysics(),
         itemBuilder: (context, index) {
+          // print('빌드된 아이템 인덱스: $index');
+
           return GestureDetector(
             onTap: () {
-              context.goNamed(
-                AppRoutes.DetailPage.name,
-                pathParameters: {'id': homeState.todos[index].id},
+              // context.goNamed(
+              //   AppRoutes.DetailPage.name,
+              //   pathParameters: {'id': homeState.todos[index].id},
+              // );
+
+              Throttler.run(
+                'go_to_detail_${homeState.todos[index].id}',
+                duration: Duration(milliseconds: 500),
+                action: () {
+                  context.goNamed(
+                    AppRoutes.DetailPage.name,
+                    pathParameters: {'id': homeState.todos[index].id},
+                  );
+                },
               );
             },
 

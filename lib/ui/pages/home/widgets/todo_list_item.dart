@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tasks/core/utils/throttler.dart';
 import 'package:tasks/ui/pages/home/home_view_model.dart';
-import 'package:tasks/utils/dialog_utils.dart';
-import 'package:tasks/utils/snackbar_utils.dart';
+import 'package:tasks/core/utils/dialog_utils.dart';
+import 'package:tasks/core/utils/snackbar_utils.dart';
 
 class ToDoWidget extends ConsumerWidget {
   const ToDoWidget({super.key, required this.todoId});
@@ -29,8 +30,14 @@ class ToDoWidget extends ConsumerWidget {
             child: InkWell(
               borderRadius: BorderRadius.circular(50),
               onTap: () {
-                final vm = ref.read(homeViewModel.notifier);
-                vm.onEvent(HomeToggleDone(todoId));
+                Throttler.run(
+                  'toggle_done_$todoId',
+                  duration: Duration(milliseconds: 300),
+                  action: () {
+                    final vm = ref.read(homeViewModel.notifier);
+                    vm.onEvent(HomeToggleDone(todoId));
+                  },
+                );
               },
               child: SizedBox(
                 width: 40,
@@ -68,8 +75,14 @@ class ToDoWidget extends ConsumerWidget {
             child: InkWell(
               borderRadius: BorderRadius.circular(50),
               onTap: () {
-                final vm = ref.read(homeViewModel.notifier);
-                vm.onEvent(HomeToggleFavorite(todoId));
+                Throttler.run(
+                  'toggle_favorite_$todoId',
+                  duration: Duration(milliseconds: 300),
+                  action: () {
+                    final vm = ref.read(homeViewModel.notifier);
+                    vm.onEvent(HomeToggleFavorite(todoId));
+                  },
+                );
               },
               child: SizedBox(
                 width: 40,
@@ -87,29 +100,35 @@ class ToDoWidget extends ConsumerWidget {
             child: InkWell(
               borderRadius: BorderRadius.circular(50),
               onTap: () {
-                showConfirmationDialog(
-                  context: context,
-                  title: "삭제 확인",
-                  content: "정말 삭제하시겠습니까?",
-                  confirmText: "삭제",
-                  isDestructive: true,
-                  onConfirm: () async {
-                    final vm = ref.read(homeViewModel.notifier);
-                    final deletedTodo = homeState.todos.firstWhere(
-                      (t) => t.id == todoId,
-                    );
-
-                    await vm.onEvent(HomeDeleteTodo(todoId));
-
-                    if (!context.mounted) return;
-
-                    SnackbarUtils.showActionSnackBar(
+                Throttler.run(
+                  'delete_todo_$todoId',
+                  duration: Duration(milliseconds: 500),
+                  action: () {
+                    showConfirmationDialog(
                       context: context,
-                      text: "할 일이 삭제되었습니다",
-                      actionLabel: "취소",
-                      onAction: () async {
-                        vm.onEvent(HomeAddTodo(deletedTodo));
-                        await vm.onEvent(HomeFetchRequested());
+                      title: "삭제 확인",
+                      content: "정말 삭제하시겠습니까?",
+                      confirmText: "삭제",
+                      isDestructive: true,
+                      onConfirm: () async {
+                        final vm = ref.read(homeViewModel.notifier);
+                        final deletedTodo = homeState.todos.firstWhere(
+                          (t) => t.id == todoId,
+                        );
+
+                        await vm.onEvent(HomeDeleteTodo(todoId));
+
+                        if (!context.mounted) return;
+
+                        SnackbarUtils.showActionSnackBar(
+                          context: context,
+                          text: "할 일이 삭제되었습니다",
+                          actionLabel: "취소",
+                          onAction: () async {
+                            vm.onEvent(HomeAddTodo(deletedTodo));
+                            await vm.onEvent(HomeFetchRequested());
+                          },
+                        );
                       },
                     );
                   },

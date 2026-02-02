@@ -15,9 +15,26 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<TodoPageResult> getToDos({int limit = 15, Object? lastCursor}) async {
     try {
+      Object? finalCursor = lastCursor;
+
+      // lastCursor가 Entity라면 DTO로 변환
+      if (lastCursor is ToDoEntity) {
+        finalCursor = ToDoDto(
+          id: lastCursor.id,
+          title: lastCursor.title,
+          description: lastCursor.description,
+          isFavorite: lastCursor.isFavorite,
+          isDone: lastCursor.isDone,
+          createdAt: Timestamp.fromDate(lastCursor.createdAt),
+          updatedAt: lastCursor.updatedAt != null
+              ? Timestamp.fromDate(lastCursor.updatedAt!)
+              : null,
+        );
+      }
+
       final todoDtos = await _todoDataSource.getTodos(
         limit: limit,
-        lastCursor: lastCursor,
+        lastCursor: finalCursor,
       );
 
       final todoEntities = todoDtos.map((dto) {
