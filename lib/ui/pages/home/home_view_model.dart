@@ -21,7 +21,11 @@ sealed class HomeEvent {
   const HomeEvent();
 }
 
+/// 할 일 가져오기
 class HomeFetchRequested extends HomeEvent {}
+
+/// 새로고침
+class HomeRefreshRequested extends HomeEvent {}
 
 /// 할 일 추가
 class HomeAddTodo extends HomeEvent {
@@ -66,11 +70,12 @@ class HomeViewModel extends Notifier<HomeState> {
   Future<void> onEvent(HomeEvent event) async {
     final todoListNotifier = ref.read(todoListProvider.notifier);
 
-    state = state.copyWith(isLoading: true);
-
     switch (event) {
       case HomeFetchRequested():
-        await todoListNotifier.fetch();
+        await todoListNotifier.fetch(isRefresh: false);
+
+      case HomeRefreshRequested():
+        await todoListNotifier.fetch(isRefresh: true);
 
       case HomeAddTodo(todo: final todo):
         await todoListNotifier.saveTodo(todo: todo);

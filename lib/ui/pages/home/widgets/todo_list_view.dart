@@ -15,9 +15,10 @@ class TodoView extends ConsumerWidget {
     return NotificationListener(
       onNotification: (notification) {
         if (notification is ScrollUpdateNotification) {
-          if (notification.metrics.pixels >=
-              notification.metrics.maxScrollExtent) {
-            print('마지막입니다.');
+          final metrics = notification.metrics;
+
+          if (metrics.pixels >= metrics.maxScrollExtent - 200) {
+            ref.read(homeViewModel.notifier).onEvent(HomeFetchRequested());
           }
         }
         return false;

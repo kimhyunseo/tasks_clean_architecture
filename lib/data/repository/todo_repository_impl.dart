@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tasks/data/todo_firestore_dto.dart';
+import 'package:tasks/data/dto/todo_firestore_dto.dart';
 import 'package:tasks/domain/entity/todo_page_result.dart';
 import 'package:tasks/domain/repository/todo_repository.dart';
-import '../entity/todo_entity.dart';
+import '../../domain/entity/todo_entity.dart';
 
 class TodoRepositoryImpl implements TodoRepository {
   final FirebaseFirestore firestore;

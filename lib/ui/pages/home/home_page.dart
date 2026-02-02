@@ -50,7 +50,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.read(homeViewModel.notifier).onEvent(HomeFetchRequested());
+          ref.read(homeViewModel.notifier).onEvent(HomeRefreshRequested());
 
           await Future.delayed(const Duration(seconds: 1));
           if (!mounted) return;
