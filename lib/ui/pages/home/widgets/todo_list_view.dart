@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tasks/core/routes/app_routes.dart';
 import 'package:tasks/ui/pages/home/home_view_model.dart';
 import 'package:tasks/ui/pages/home/widgets/todo_list_item.dart';
 
@@ -28,7 +29,10 @@ class TodoView extends ConsumerWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              context.go('/detail/${homeState.todos[index].id}');
+              context.goNamed(
+                AppRoutes.DetailPage.name,
+                pathParameters: {'id': homeState.todos[index].id},
+              );
             },
 
             child: ToDoWidget(todoId: homeState.todos[index].id),
