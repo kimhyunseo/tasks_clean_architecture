@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:tasks/core/utils/throttler.dart';
 import 'package:tasks/domain/entity/todo_entity.dart';
 import 'package:tasks/ui/pages/detail/detail_view_model.dart';

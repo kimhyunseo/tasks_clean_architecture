@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tasks/data/datasource/todo_data_source.dart';
 import 'package:tasks/data/dto/todo_firestore_dto.dart';
+import 'package:tasks/data/dto/todo_statistics_dto.dart';
 
 class TodoDataSourceImpl implements TodoDataSource {
   TodoDataSourceImpl(this._firestore);
@@ -38,5 +39,26 @@ class TodoDataSourceImpl implements TodoDataSource {
   Future<void> deleteTodo(String id) {
     final docRef = _firestore.collection('todos').doc(id);
     return docRef.delete();
+  }
+
+  @override
+  Future<TodoStatisticsDto> getTodoStatistics() async {
+    final todosCollection = _firestore.collection('todos');
+
+    // 두 개의 집계 쿼리를 병렬로 실행
+    final totalCountQuery = todosCollection.count();
+    final completedCountQuery = todosCollection
+        .where('isDone', isEqualTo: true)
+        .count();
+
+    final results = await Future.wait([
+      totalCountQuery.get(),
+      completedCountQuery.get(),
+    ]);
+
+    final totalCount = results[0].count ?? 0;
+    final completedCount = results[1].count ?? 0;
+
+    return TodoStatisticsDto(total: totalCount, completed: completedCount);
   }
 }

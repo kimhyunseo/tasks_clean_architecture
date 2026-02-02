@@ -1,5 +1,6 @@
 import 'package:tasks/domain/entity/todo_entity.dart';
 import 'package:tasks/domain/entity/todo_page_result.dart';
+import 'package:tasks/domain/entity/todo_statistics.dart';
 import 'package:tasks/domain/repository/todo_repository.dart';
 
 class TodoRepositoryMock implements TodoRepository {
@@ -50,5 +51,11 @@ class TodoRepositoryMock implements TodoRepository {
   @override
   Future<void> deleteToDo(String id) async {
     _mockData.removeWhere((e) => e.id == id);
+  }
+
+  @override
+  Future<TodoStatistics> getTodoStatistics() async {
+    final completedCount = _mockData.where((e) => e.isDone).length;
+    return TodoStatistics(total: _mockData.length, completed: completedCount);
   }
 }

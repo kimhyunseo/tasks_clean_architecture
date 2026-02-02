@@ -2,17 +2,28 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tasks/domain/entity/todo_entity.dart';
+import 'package:tasks/domain/entity/todo_statistics.dart';
 import 'package:tasks/ui/todo_list_notifier.dart';
 
 class HomeState {
   final List<ToDoEntity> todos;
   final bool isLoading;
-  HomeState({required this.todos, this.isLoading = false});
+  final TodoStatistics statistics;
+  HomeState({
+    required this.todos,
+    this.isLoading = false,
+    required this.statistics,
+  });
 
-  HomeState copyWith({List<ToDoEntity>? todos, bool? isLoading}) {
+  HomeState copyWith({
+    List<ToDoEntity>? todos,
+    bool? isLoading,
+    TodoStatistics? statistics,
+  }) {
     return HomeState(
       todos: todos ?? this.todos,
       isLoading: isLoading ?? this.isLoading,
+      statistics: statistics ?? this.statistics,
     );
   }
 }
@@ -64,6 +75,7 @@ class HomeViewModel extends Notifier<HomeState> {
     return HomeState(
       todos: todoListState.todos,
       isLoading: todoListState.isLoading,
+      statistics: todoListState.statistics,
     );
   }
 

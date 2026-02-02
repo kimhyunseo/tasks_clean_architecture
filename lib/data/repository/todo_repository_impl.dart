@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tasks/data/datasource/todo_data_source.dart';
 import 'package:tasks/data/dto/todo_firestore_dto.dart';
 import 'package:tasks/domain/entity/todo_page_result.dart';
+import 'package:tasks/domain/entity/todo_statistics.dart';
 import 'package:tasks/domain/repository/todo_repository.dart';
 import '../../domain/entity/todo_entity.dart';
 
@@ -103,13 +104,23 @@ class TodoRepositoryImpl implements TodoRepository {
     }
   }
 
-  /// 할 일 삭제
   @override
   Future<void> deleteToDo(String id) async {
     try {
       await _todoDataSource.deleteTodo(id);
     } catch (e) {
       print('할 일 삭제 중 오류 발생: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<TodoStatistics> getTodoStatistics() async {
+    try {
+      final dto = await _todoDataSource.getTodoStatistics();
+      return TodoStatistics(total: dto.total, completed: dto.completed);
+    } catch (e) {
+      print('할 일 통계 불러오는 중 오류 발생: $e');
       rethrow;
     }
   }

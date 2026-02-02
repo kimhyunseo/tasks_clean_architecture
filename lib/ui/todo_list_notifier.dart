@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:tasks/domain/entity/todo_entity.dart';
+import 'package:tasks/domain/entity/todo_statistics.dart';
 import 'package:tasks/domain/repository/todo_repository.dart';
+import 'package:tasks/domain/usecase/get_todo_statistics_usecase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tasks/ui/providers.dart';
 
@@ -10,12 +12,14 @@ class TodoListState {
   final Object? lastCursor;
   final bool isLastPage;
   final bool isLoading;
+  final TodoStatistics statistics;
 
   TodoListState({
     this.todos = const [],
     this.lastCursor,
     this.isLastPage = false,
     this.isLoading = false,
+    this.statistics = const TodoStatistics(completed: 0, total: 0),
   });
 
   TodoListState copyWith({
@@ -23,23 +27,27 @@ class TodoListState {
     Object? lastCursor,
     bool? isLastPage,
     bool? isLoading,
+    TodoStatistics? statistics,
   }) {
     return TodoListState(
       todos: todos ?? this.todos,
       lastCursor: lastCursor ?? this.lastCursor,
       isLastPage: isLastPage ?? this.isLastPage,
       isLoading: isLoading ?? this.isLoading,
+      statistics: statistics ?? this.statistics,
     );
   }
 }
 
 class TodoListNotifier extends Notifier<TodoListState> {
   late final TodoRepository _repo;
+  late final GetTodoStatisticsUseCase _getStatisticsUseCase;
   final int _limit = 15; // 한 번에 가져올 개수
 
   @override
   TodoListState build() {
     _repo = ref.read(todoRepositoryProvider);
+    _getStatisticsUseCase = ref.read(getTodoStatisticsUseCaseProvider);
     Future.microtask(() => fetch());
     return TodoListState();
   }
@@ -68,6 +76,8 @@ class TodoListNotifier extends Notifier<TodoListState> {
         isLastPage: result.todos.length < _limit,
         isLoading: false,
       );
+
+      _refreshStatistics();
     } catch (e) {
       state = state.copyWith(isLoading: false);
       print('데이터 호출 실패: $e');
@@ -79,6 +89,8 @@ class TodoListNotifier extends Notifier<TodoListState> {
     try {
       final savedTodo = await _repo.addToDo(todo: todo);
       state = state.copyWith(todos: [savedTodo, ...state.todos]);
+
+      _refreshStatistics();
     } catch (e) {
       print('할 일 저장 실패: $e');
       rethrow;
@@ -93,6 +105,8 @@ class TodoListNotifier extends Notifier<TodoListState> {
       state = state.copyWith(
         todos: state.todos.where((t) => t.id != id).toList(),
       );
+
+      _refreshStatistics();
     } catch (e) {
       print('할 일 삭제 실패: $e');
       rethrow;
@@ -106,6 +120,8 @@ class TodoListNotifier extends Notifier<TodoListState> {
       state = state.copyWith(
         todos: state.todos.map((t) => t.id == todo.id ? todo : t).toList(),
       );
+
+      _refreshStatistics();
     } catch (e) {
       print('업데이트 실패: $e');
       rethrow;
@@ -123,6 +139,15 @@ class TodoListNotifier extends Notifier<TodoListState> {
   Future<void> toggleDone(String id) async {
     final todo = state.todos.firstWhere((t) => t.id == id);
     await _update(todo.copyWith(isDone: !todo.isDone));
+  }
+
+  Future<void> _refreshStatistics() async {
+    try {
+      final statistics = await _getStatisticsUseCase.execute();
+      state = state.copyWith(statistics: statistics);
+    } catch (e) {
+      print('통계 갱신 실패: $e');
+    }
   }
 }
 

@@ -25,7 +25,7 @@ class TodoView extends ConsumerWidget {
         return false;
       },
       child: ListView.builder(
-        padding: EdgeInsets.fromLTRB(12, 12, 12, 150),
+        padding: EdgeInsets.fromLTRB(12, 0, 12, 150),
         itemCount: homeState.todos.length,
         physics: const AlwaysScrollableScrollPhysics(),
         itemBuilder: (context, index) {
