@@ -48,7 +48,10 @@ class TodoListNotifier extends Notifier<TodoListState> {
     // 이미 마지막 페이지이거나 로딩 중이면 중단
     if (!isRefresh && (state.isLastPage || state.isLoading)) return;
 
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(
+      isLoading: true,
+      isLastPage: isRefresh ? false : state.isLastPage,
+    );
 
     try {
       // 새로고침이면 커서를 null로, 아니면 현재 state의 마지막 커서 전달

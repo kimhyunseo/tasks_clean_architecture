@@ -1,34 +1,26 @@
 // ignore_for_file: avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tasks/data/datasource/todo_data_source.dart';
 import 'package:tasks/data/dto/todo_firestore_dto.dart';
 import 'package:tasks/domain/entity/todo_page_result.dart';
 import 'package:tasks/domain/repository/todo_repository.dart';
 import '../../domain/entity/todo_entity.dart';
 
 class TodoRepositoryImpl implements TodoRepository {
-  final FirebaseFirestore firestore;
-  TodoRepositoryImpl(this.firestore);
+  TodoRepositoryImpl(this._todoDataSource);
+  final TodoDataSource _todoDataSource;
 
   /// 할 일 목록 보기
   @override
   Future<TodoPageResult> getToDos({int limit = 15, Object? lastCursor}) async {
     try {
-      Query<Map<String, dynamic>> query = firestore
-          .collection('todos')
-          .orderBy('createdAt', descending: true)
-          .limit(limit);
+      final todoDtos = await _todoDataSource.getTodos(
+        limit: limit,
+        lastCursor: lastCursor,
+      );
 
-      if (lastCursor != null) {
-        query = query.startAfterDocument(
-          lastCursor as DocumentSnapshot<Map<String, dynamic>>,
-        );
-      }
-
-      final result = await query.get();
-
-      final todos = result.docs.map((doc) {
-        final dto = ToDoDto.fromFirestore(doc);
+      final todoEntities = todoDtos.map((dto) {
         return ToDoEntity(
           id: dto.id,
           title: dto.title,
@@ -41,10 +33,9 @@ class TodoRepositoryImpl implements TodoRepository {
       }).toList();
 
       return TodoPageResult(
-        todos: todos,
-        lastCursor: result.docs.isNotEmpty
-            ? result.docs.last as DocumentSnapshot<Map<String, dynamic>>
-            : null,
+        todos: todoEntities,
+        lastCursor: todoEntities.isNotEmpty ? todoEntities.last : null,
+        hasMore: todoEntities.length >= limit,
       );
     } catch (e) {
       print('할 일 목록을 불러오는 중 오류 발생: $e');
@@ -56,10 +47,8 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<ToDoEntity> addToDo({required ToDoEntity todo}) async {
     try {
-      final docRef = firestore.collection('todos').doc();
-
       final dto = ToDoDto(
-        id: docRef.id,
+        id: todo.id,
         title: todo.title,
         description: todo.description,
         isFavorite: todo.isFavorite,
@@ -68,8 +57,8 @@ class TodoRepositoryImpl implements TodoRepository {
         updatedAt: null,
       );
 
-      await docRef.set(dto.toFirestore());
-      return todo.copyWith(id: docRef.id);
+      final addedDto = await _todoDataSource.addTodo(dto);
+      return todo.copyWith(id: addedDto.id);
     } catch (e) {
       print('할 일 추가 중 오류 발생: $e');
       rethrow;
@@ -90,10 +79,7 @@ class TodoRepositoryImpl implements TodoRepository {
         updatedAt: Timestamp.now(),
       );
 
-      await firestore
-          .collection('todos')
-          .doc(todo.id)
-          .update(dto.toFirestore());
+      await _todoDataSource.updateTodo(dto);
     } catch (e) {
       print('할 일 수정 중 오류 발생: $e');
       rethrow;
@@ -104,7 +90,7 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<void> deleteToDo(String id) async {
     try {
-      await firestore.collection('todos').doc(id).delete();
+      await _todoDataSource.deleteTodo(id);
     } catch (e) {
       print('할 일 삭제 중 오류 발생: $e');
       rethrow;

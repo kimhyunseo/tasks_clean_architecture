@@ -30,7 +30,7 @@ class ToDoWidget extends ConsumerWidget {
               borderRadius: BorderRadius.circular(50),
               onTap: () {
                 final vm = ref.read(homeViewModel.notifier);
-                vm.onEvent(HomeToggleDoneRequested(todoId));
+                vm.onEvent(HomeToggleDone(todoId));
               },
               child: SizedBox(
                 width: 40,

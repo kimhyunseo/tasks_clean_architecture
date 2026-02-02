@@ -42,4 +42,24 @@ class ToDoDto {
       'updatedAt': updatedAt,
     };
   }
+
+  ToDoDto copyWith({
+    String? id,
+    String? title,
+    String? description,
+    bool? isFavorite,
+    bool? isDone,
+    Timestamp? createdAt,
+    Timestamp? updatedAt,
+  }) {
+    return ToDoDto(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      isFavorite: isFavorite ?? this.isFavorite,
+      isDone: isDone ?? this.isDone,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

@@ -52,9 +52,9 @@ class HomeToggleFavorite extends HomeEvent {
 }
 
 /// 완료 토글
-class HomeToggleDoneRequested extends HomeEvent {
+class HomeToggleDone extends HomeEvent {
   final String id;
-  HomeToggleDoneRequested(this.id);
+  HomeToggleDone(this.id);
 }
 
 class HomeViewModel extends Notifier<HomeState> {
@@ -70,30 +70,32 @@ class HomeViewModel extends Notifier<HomeState> {
   Future<void> onEvent(HomeEvent event) async {
     final todoListNotifier = ref.read(todoListProvider.notifier);
 
-    switch (event) {
-      case HomeFetchRequested():
-        await todoListNotifier.fetch(isRefresh: false);
+    try {
+      switch (event) {
+        case HomeFetchRequested():
+          await todoListNotifier.fetch(isRefresh: false);
 
-      case HomeRefreshRequested():
-        await todoListNotifier.fetch(isRefresh: true);
+        case HomeRefreshRequested():
+          await todoListNotifier.fetch(isRefresh: true);
 
-      case HomeAddTodo(todo: final todo):
-        await todoListNotifier.saveTodo(todo: todo);
+        case HomeAddTodo(todo: final todo):
+          await todoListNotifier.saveTodo(todo: todo);
 
-      case HomeDeleteTodo(id: final id):
-        await todoListNotifier.deleteTodo(id: id);
+        case HomeDeleteTodo(id: final id):
+          await todoListNotifier.deleteTodo(id: id);
 
-      case HomeEditTodo(todo: final todo):
-        await todoListNotifier.editTodo(todo);
+        case HomeEditTodo(todo: final todo):
+          await todoListNotifier.editTodo(todo);
 
-      case HomeToggleFavorite(id: final id):
-        await todoListNotifier.toggleFavorite(id);
+        case HomeToggleFavorite(id: final id):
+          await todoListNotifier.toggleFavorite(id);
 
-      case HomeToggleDoneRequested(id: final id):
-        await todoListNotifier.toggleDone(id);
+        case HomeToggleDone(id: final id):
+          await todoListNotifier.toggleDone(id);
+      }
+    } catch (e) {
+      print('HomeViewModel 이벤트 처리 중 에러 발생: $e');
     }
-
-    state = state.copyWith(isLoading: false);
   }
 }
 
