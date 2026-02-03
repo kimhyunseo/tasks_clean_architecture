@@ -61,7 +61,7 @@ class ToDoWidget extends ConsumerWidget {
                 child: Text(
                   todo.title,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                   overflow: TextOverflow.ellipsis,

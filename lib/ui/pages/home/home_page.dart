@@ -65,15 +65,19 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ? ListView(children: [const EmptyTodo()])
                         : const TodoView(),
                   ),
-                  TodoDashboard(
-                    statistics: homeState.statistics,
-                    isHorizontal: true,
-                  ),
+
+                  if (homeState.todos.isNotEmpty)
+                    TodoDashboard(
+                      statistics: homeState.statistics,
+                      isHorizontal: true,
+                    ),
                 ],
               )
             : Column(
                 children: [
-                  TodoDashboard(statistics: homeState.statistics),
+                  if (homeState.todos.isNotEmpty)
+                    TodoDashboard(statistics: homeState.statistics),
+
                   Expanded(
                     child: homeState.todos.isEmpty
                         ? ListView(children: [const EmptyTodo()])
