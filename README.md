@@ -1,6 +1,6 @@
 # 📝 Tasks (To-Do App) v3.0
 
-Clean Architecture와 Riverpod 기반의 고성능 할 일 관리 앱입니다.
+Clean Architecture와 Riverpod 기반의 할 일 관리 앱입니다.
 아키텍처 원칙을 준수하여 대량의 데이터 환경에서도 끊김 없는 쾌적한 경험을 제공합니다.
 
 ---
@@ -22,27 +22,21 @@ Clean Architecture와 Riverpod 기반의 고성능 할 일 관리 앱입니다.
 
 ## 📸 실행 화면 (Screenshots)
 
-### Main & Weather View (Empty)
+### Home Page
 
-<img width="410" height="857" alt="스크린샷 2026-01-12 오후 11 57 38" src="https://github.com/user-attachments/assets/7b5f98e9-800f-4a82-ae62-d48cff63d206" />
-
-<img width="410" height="857" alt="스크린샷 2026-01-12 오후 11 58 39" src="https://github.com/user-attachments/assets/33ce6df1-a9b0-480b-83da-79debef15ffb" />
-
-
+<img width="482" height="842" alt="스크린샷 2026-02-05 오전 10 15 51" src="https://github.com/user-attachments/assets/84c079ca-19e0-4e0d-b899-2aff026b8be5" />
+<img width="482" height="842" alt="스크린샷 2026-02-05 오전 10 24 11" src="https://github.com/user-attachments/assets/cf2994ed-05cd-47fb-87e5-46e58e4d90ba" />
+<img width="482" height="842" alt="스크린샷 2026-02-05 오전 10 24 18" src="https://github.com/user-attachments/assets/5b1b45ac-e1f8-4d72-8ab5-c8b82151733d" />
+<img width="482" height="842" alt="스크린샷 2026-02-05 오전 10 24 21" src="https://github.com/user-attachments/assets/57f145c4-ea96-4d69-b642-d1b2c2f65167" />
 
 ### Add Task (BottomSheet)
 
-<img width="410" height="857" alt="스크린샷 2026-01-12 오후 11 57 46" src="https://github.com/user-attachments/assets/7b68a17b-84f2-41c7-a25e-d2ff91ab1770" />
-
+<img width="482" height="842" alt="스크린샷 2026-02-05 오전 10 18 12" src="https://github.com/user-attachments/assets/76e64e9f-4987-4f16-a954-b83b0ba08e34" />
 
 ### Detail View & Edit
 
-<img width="410" height="857" alt="스크린샷 2026-01-12 오후 11 58 14" src="https://github.com/user-attachments/assets/d44efbd0-299d-4cda-a4b7-3af52ff65dca" />
-
-
-### Dark Mode
-
-<img width="410" height="857" alt="스크린샷 2026-01-12 오후 11 58 25" src="https://github.com/user-attachments/assets/1e638d62-c440-4faf-8e7e-1a213a7bb4f6" />
+<img width="482" height="842" alt="스크린샷 2026-02-05 오전 10 18 30" src="https://github.com/user-attachments/assets/21723fcc-5418-4bea-8ed4-0500bfd93235" />
+<img width="482" height="842" alt="스크린샷 2026-02-05 오전 10 18 48" src="https://github.com/user-attachments/assets/99164076-ff4e-4e65-92d4-9ca330878b57" />
 
 
 ## 📂 폴더 구조 (Folder Structure)
